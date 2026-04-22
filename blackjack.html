@@ -25,7 +25,7 @@
         // Reset this at the start of each new hand
         // -------------------------------------------------------
         let gameState = {
-            playerCards:   [],    // array of card objects in player's hand
+            playerCards: [],    // array of card objects in player's hand
             dealerCards:   [],    // array of card objects in dealer's hand
             discard:       [],    // all cards played — sent to server with every draw
             playerWins:    0,     // hands won
@@ -80,6 +80,7 @@
                 })
                 .then(function(data) {
                     if (data.error) {
+                        console.log("drawCards response:", data);
                         console.error("Server error:", data.error);
                         return [];
                     }
@@ -117,7 +118,9 @@
                     div.textContent = card.rank + card.suit;
                 }
                 container.appendChild(div);
+
             });
+
         }
 
         // -------------------------------------------------------
@@ -211,7 +214,6 @@
         // -------------------------------------------------------
         function playerHit() {
             // YOUR CODE HERE
-
             drawCards(1).then(function(cards) {
                 gameState.playerCards.push(cards[0]);
                 gameState.discard.push(cards[0]);
@@ -397,7 +399,6 @@
             gameState.discard = [];
             // YOUR CODE HERE — show reshuffle message
             document.getElementById("message").textContent = "Deck Reshuffled!";
-
         }
 
         // -------------------------------------------------------
@@ -408,11 +409,21 @@
         //     // Prompt for number of hands
         //     // ToDo Promot for hands set global variable
             let promptNumber = gameState.totalHands = prompt("How many hands do you want to play?","5");
+            if(isNaN(promptNumber) || promptNumber < 1 || promptNumber > 100000){
+                promptNumber = 5; //if the user enters something invalid I default it to 5.
+                let msg = document.getElementById("message");
+                msg.textContent = "⚠️INVALID INPUT DEFAULTED TO 5 ROUNDS⚠️";
+                msg.style.color = "crimson";
+                gameState.totalHands = promptNumber; //came back and added this later because I did not reupdate the global variable
+                                                    //it still would make totalHands the invalid input if I did not have this
+            }
             document.getElementById("scoreHandsRemaining").innerHTML = promptNumber;
             document.getElementById("totalHands").innerHTML = promptNumber;
             document.getElementById("btnDeal").addEventListener("click", dealInitialCards);
             document.getElementById("btnHit").addEventListener("click", playerHit);
             document.getElementById("btnStand").addEventListener("click", playerStand);
+            document.getElementById("btnHit").disabled = true;
+            document.getElementById("btnStand").disabled = true;
         });
 
     </script>
